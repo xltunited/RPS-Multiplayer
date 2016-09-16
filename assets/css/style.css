@@ -1,0 +1,43 @@
+body {
+
+	margin-top: 50px;
+	margin-bottom: 50px;
+	background: none;
+
+}
+
+.full {
+
+	background: url(../images/background2.jpg) no-repeat center center fixed; 
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+
+}
+
+.mainHeader{
+
+	text-align: center;
+
+	font-family: 'Abril Fatface', cursive;
+
+	font-size: 4em;
+
+	color: #ffffff;
+
+}
+
+.gameIntro{
+
+	font-family: 'Lora', serif;
+
+	font-size: 1.2em;
+
+}
+
+.card-title{
+
+	text-align: center;
+
+}
