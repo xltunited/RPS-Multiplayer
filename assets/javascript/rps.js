@@ -72,16 +72,26 @@ $(document).ready(function(){
 
 			database.ref(snapshot.val().requestedBy).on("value", function(snapshotreq) {
 
-				$('.modal-name' + snapshot.val().ID).append(_.capitalize(snapshotreq.val().name));
+				$('.modal-name' + snapshot.val().ID).html(_.capitalize(snapshotreq.val().name));
 
 			}, function (errorObject) {
 
 			  	console.log("The read failed: " + errorObject.code);
 
+			});	
+
+		}
+
+		if(snapshot.val().requestStatus == 'denied'){
+
+			database.ref(snapshot.val().ID).update({
+	
+				requestStatus : 'neutral'
+
 			});
 
+			$('.modalR' + snapshot.val().ID).css('display', 'block');
 			
-
 		}
 
 	}, function(errorObject) {
@@ -138,7 +148,9 @@ $(document).ready(function(){
 
 						requested: false,
 
-						requestedBy: -1
+						requestedBy: -1,
+
+						requestStatus: 'neutral'
 
 					}
 
@@ -149,6 +161,10 @@ $(document).ready(function(){
 				$('.modal').addClass('modal' + userIdNumber);
 
 				$('.modal-requester').addClass('modal-name' + userIdNumber);
+
+				$('.modalReject').attr('data-modalid', userIdNumber);
+
+				$('.modalReject').addClass('modalR' + userIdNumber);
 		
 			});
 			
@@ -199,6 +215,36 @@ $(document).ready(function(){
 			}
 
 		});
+
+	});
+
+	$('.deny').on('click', function(){
+
+		$('#myModal').css('display', 'none');
+
+		database.ref(userIdNumber).once("value").then(function(snapshot){
+
+			database.ref(snapshot.val().requestedBy).update({
+
+				requestStatus: 'denied'
+
+			});
+
+			database.ref(userIdNumber).update({
+
+				requested: false,
+
+				requestedBy: -1,
+
+			});
+	
+		});
+
+	});
+
+	$('.closeReject').on('click', function(){
+
+		$('.modalReject').css('display', 'none');
 
 	});
 
