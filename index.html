@@ -46,6 +46,10 @@
 
 		<link href="https://fonts.googleapis.com/css?family=Abril+Fatface|Lora" rel="stylesheet">
 
+		<!-- Lodash -->
+
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.js"></script>
+
 		<!-- My JS File -->
 
 		<script src="./assets/javascript/rps.js"></script>
@@ -133,6 +137,105 @@
 				</div>
 
 				<div class="col-sm-3"></div>
+
+			</div>
+
+		</div>
+
+		<div class="container-fluid lobby">
+			
+			<div class="row mainHeader">
+					
+				<div class="col-sm-12">
+					
+					<p>Lobby</p>
+
+				</div>
+
+			</div>
+
+			<div class="row">
+				
+				<div class="col-sm-3"></div>
+
+				<div class="col-sm-6">
+					
+					<div class="card">
+						
+						<div class="card-block">
+
+							<h4 class="card-title">Online Users</h4>
+
+							<table class ="table">
+							
+							<thead>
+
+								<tr>
+
+									<th>UserName</th>
+
+									<th>Wins</th>
+
+									<th>Losses</th>
+
+									<th></th>
+
+								</tr>
+
+							</thead>
+							
+							<tbody class="tableBody">
+								
+							
+							</tbody>
+							
+						</table>
+
+						</div>
+
+					</div>
+
+				</div>
+
+				<div class="col-sm-3"></div>
+
+			</div>
+
+			<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+				<div class="modal-dialog modal-lg" role="document">
+
+					<div class="modal-content">
+
+						<div class="modal-header">
+
+							<button type="button" class="close deny" data-dismiss="modal" aria-label="Close">
+
+								<span aria-hidden="true">&times;</span>
+
+							</button>
+
+							<h4 class="modal-title" id="myModalLabel">Game Request</h4>
+
+						</div>
+
+						<div class="modal-body">
+
+						<span class="modal-requester"></span> would like to play RPS with you.
+
+						</div>
+
+						<div class="modal-footer">
+
+							<button type="button" class="btn btn-secondary deny">No</button>
+
+							<button type="button" class="btn btn-primary accept">Yes</button>
+
+						</div>
+
+					</div>
+
+				</div>
 
 			</div>
 

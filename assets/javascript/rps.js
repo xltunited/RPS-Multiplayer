@@ -1,5 +1,13 @@
 $(document).ready(function(){
 
+	var userName;
+
+	var userWins;
+
+	var userLosses;
+
+	var totalUsers;
+
 	var config = {
 
 	    apiKey: "AIzaSyB1FkxhV9lBENS4EBj7VMATN1Z6Ui6LiKo",
@@ -14,12 +22,72 @@ $(document).ready(function(){
 
 	var database = firebase.database();
 
-	var userIdNumber = 0;
+	var userIdNumber;
 
-	database.ref().once("value").then(function(snapshot){
+	var userAdd;
 
-		userIdNumber = snapshot.val().numberOfUsers;
-		
+	database.ref().on("value", function(snapshot) {
+
+		totalUsers = snapshot.val().numberOfUsers;
+
+	}, function (errorObject) {
+
+	  	console.log("The read failed: " + errorObject.code);
+
+	});
+
+	database.ref().on("child_added", function(snapshot) {
+
+		if(snapshot.hasChild('ID') == true & snapshot.val().online == true){
+
+			$('.tableBody').append($('<tr class="tableRemove '+ snapshot.val().name + '"></tr>'));
+
+			$('.' + snapshot.val().name).append('<td class="tableRemove">' + _.capitalize(snapshot.val().name) + '</td>');
+
+			$('.' + snapshot.val().name).append('<td class="tableRemove">' + snapshot.val().wins + '</td>');
+
+			$('.' + snapshot.val().name).append('<td class="tableRemove">' + snapshot.val().losses + '</td>');
+
+			$('.' + snapshot.val().name).append('<td class="tableRemove"><button class="play btn btn-outline-success" data-id="' + snapshot.val().ID + '">Play</button></td>');
+
+		}
+
+	}, function(errorObject) {
+
+		console.log("Errors handled: " + errorObject.code);
+
+	});
+
+	database.ref().on("child_changed", function(snapshot) {
+
+		if(snapshot.hasChild('ID') == true && snapshot.val().online == false){
+
+			$('.' + snapshot.val().name).remove();
+			
+		}
+
+		if(snapshot.hasChild('ID') == true & snapshot.val().requested == true & $('.modal').attr('data-modalid') == snapshot.val().ID){
+
+			$('.modal' + snapshot.val().ID).css('display', 'block');
+
+			database.ref(snapshot.val().requestedBy).on("value", function(snapshotreq) {
+
+				$('.modal-name' + snapshot.val().ID).append(_.capitalize(snapshotreq.val().name));
+
+			}, function (errorObject) {
+
+			  	console.log("The read failed: " + errorObject.code);
+
+			});
+
+			
+
+		}
+
+	}, function(errorObject) {
+
+		console.log("Errors handled: " + errorObject.code);
+
 	});
 
 	$('#dataInitializer').on('click', function(){
@@ -30,41 +98,69 @@ $(document).ready(function(){
 
 		if(/^[a-zA-Z]+$/.test(userIni)){
 
-			userIdNumber = parseInt(userIdNumber);
+			userName = userIni;
 
-			userIdNumber++;
+			userWins = 0;
 
-			localStorage.setItem('thisUserId', userIdNumber);
+			userLosses = 0;
 
-			database.ref().update({
+			database.ref().once("value").then(function(snapshot){
 
-				numberOfUsers : userIdNumber,	
+				userIdNumber = snapshot.val().numberOfUsers;
 
-				[userIdNumber]:{
+				console.log(snapshot.val().numberOfUsers);
 
-					name : userIni,
+				console.log(userIdNumber);
 
-					losses: 0,
+				userIdNumber++;
 
-					wins: 0,
+				localStorage.setItem('thisUserId', userIdNumber);
 
-					online: true,
+				console.log(userIdNumber);
+
+				database.ref().update({
+
+					numberOfUsers : userIdNumber,	
+
+					[userIdNumber]:{
+
+						name : userIni,
+
+						losses: 0,
+
+						wins: 0,
+
+						online: true,
+
+						ID: userIdNumber,
+
+						inGame: false,
+
+						requested: false,
+
+						requestedBy: -1
 
 					}
 
-			});
+				});
 
+				$('.modal').attr('data-modalid', userIdNumber);
+
+				$('.modal').addClass('modal' + userIdNumber);
+
+				$('.modal-requester').addClass('modal-name' + userIdNumber);
+		
+			});
+			
 			$(window).bind('beforeunload', function () {
  	 
-				database.ref(localStorage.getItem("thisUserId")).update({
+				database.ref(userIdNumber).update({
 	
 						online: false
 
 				});
 
 			});
-
-			
 
 		}
 
@@ -78,6 +174,32 @@ $(document).ready(function(){
 
 	});
 
-	
+	$(document).on('click', '.play', function(){
+
+		var future = $(this).attr('data-id');
+
+		database.ref(future).once("value").then(function(snapshot){
+
+			if(snapshot.val().requested == false){
+
+				database.ref(future).update({
+
+				requested: true,
+
+				requestedBy: userIdNumber
+
+				});
+
+			}
+
+			else {
+
+				alert('User is already has a request');
+
+			}
+
+		});
+
+	});
 
 });
