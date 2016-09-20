@@ -8,6 +8,8 @@ $(document).ready(function(){
 
 	var totalUsers;
 
+	var gameID;
+
 	var config = {
 
 	    apiKey: "AIzaSyB1FkxhV9lBENS4EBj7VMATN1Z6Ui6LiKo",
@@ -52,6 +54,8 @@ $(document).ready(function(){
 
 		}
 
+		
+
 	}, function(errorObject) {
 
 		console.log("Errors handled: " + errorObject.code);
@@ -86,13 +90,53 @@ $(document).ready(function(){
 
 			database.ref(snapshot.val().ID).update({
 	
-				requestStatus : 'neutral'
+				requestStatus : 'neutral',
+
+				requestedBy : -1
 
 			});
 
 			$('.modalR' + snapshot.val().ID).css('display', 'block');
 			
 		}
+
+		if(snapshot.val().requestStatus =='accepted'){
+
+			database.ref(snapshot.val().ID).update({
+
+				requestStatus : 'neutral',
+
+				mainPlayer : snapshot.val().ID,
+
+				secondPlayer: snapshot.val().requestedBy
+
+			});
+
+			$('.modalA' + snapshot.val().ID).css('display', 'block');
+			
+		}
+
+		// if(snapshot.val().requestStatus =='accepted' && snapshot.val().issecondPlayer == true){
+
+		// 	database.ref(snapshot.val().ID).update({
+
+		// 		requestStatus : 'neutral',
+
+		// 		inGame : false,
+
+		// 		mainPlayer : snapshot.val().requestedBy,
+
+		// 		secondPlayer: snapshot.val().ID,
+
+		// 	});
+
+		// 	$('.secondPlayerContainer').addClass('container' + snapshot.val().ID);
+
+		// 	$('.container' + snapshot.val().ID).css('display', 'block');
+			
+		// }
+
+
 
 	}, function(errorObject) {
 
@@ -150,7 +194,19 @@ $(document).ready(function(){
 
 						requestedBy: -1,
 
-						requestStatus: 'neutral'
+						requestStatus: 'neutral',
+
+						linkGameID : -1,
+
+						userChoice: 'none',
+
+						ismainPlayer: false,
+
+						issecondPlayer: false,
+
+						mainPlayer: -1,
+
+						secondPlayer: -1
 
 					}
 
@@ -165,6 +221,10 @@ $(document).ready(function(){
 				$('.modalReject').attr('data-modalid', userIdNumber);
 
 				$('.modalReject').addClass('modalR' + userIdNumber);
+
+				$('.modalAccept').attr('data-modalAid', userIdNumber);
+
+				$('.modalAccept').addClass('modalA' + userIdNumber);
 		
 			});
 			
@@ -192,17 +252,23 @@ $(document).ready(function(){
 
 	$(document).on('click', '.play', function(){
 
-		var future = $(this).attr('data-id');
+		var requestee = $(this).attr('data-id');
 
-		database.ref(future).once("value").then(function(snapshot){
+		database.ref(requestee).once("value").then(function(snapshot){
 
 			if(snapshot.val().requested == false){
 
-				database.ref(future).update({
+				database.ref(requestee).update({
 
-				requested: true,
+					requested: true,
 
-				requestedBy: userIdNumber
+					requestedBy: userIdNumber
+
+				});
+
+				database.ref(userIdNumber).update({
+
+					requestedBy: requestee
 
 				});
 
@@ -242,9 +308,58 @@ $(document).ready(function(){
 
 	});
 
+	$('.accept').on('click', function(){
+
+		$('.modal').css('display', 'none');
+
+		$('.mainPlayerContainer').addClass('container' + userIdNumber);
+
+		$('.container' + userIdNumber).css('display', 'block');
+
+		database.ref().once("value").then(function(snapshot){
+
+			database.ref(userIdNumber).once("value").then(function(snapshotReque){
+
+				database.ref(userIdNumber).update({
+
+					requested : false,
+
+					inGame: true,
+
+					ismainPlayer : true,
+
+				});
+
+				database.ref(snapshotReque.val().requestedBy).update({
+
+
+					requestStatus: 'accepted',
+
+					inGame: true,
+
+					issecondPlayer: true,
+
+				});
+		
+			});
+
+		});
+
+	});
+
 	$('.closeReject').on('click', function(){
 
 		$('.modalReject').css('display', 'none');
+
+	});
+
+	$('.closeAccept').on('click', function(){
+
+		$('.modalAccept').css('display', 'none');
+
+		$('.secondPlayerContainer').addClass('container' + userIdNumber);
+
+		$('.container' + userIdNumber).css('display', 'block');
 
 	});
 
