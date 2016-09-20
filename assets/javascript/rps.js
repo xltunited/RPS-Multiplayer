@@ -316,6 +316,8 @@ $(document).ready(function(){
 
 		$('.container' + userIdNumber).css('display', 'block');
 
+		$('.opponentChoiceSecond').css('display', 'block');
+
 		database.ref().once("value").then(function(snapshot){
 
 			database.ref(userIdNumber).once("value").then(function(snapshotReque){
@@ -360,6 +362,8 @@ $(document).ready(function(){
 		$('.secondPlayerContainer').addClass('container' + userIdNumber);
 
 		$('.container' + userIdNumber).css('display', 'block');
+
+		$('.opponentChoiceMain').css('display', 'block');
 
 	});
 

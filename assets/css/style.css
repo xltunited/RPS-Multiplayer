@@ -48,7 +48,7 @@ body {
 
 }
 
-.mainPlayerContainer, .secondPlayerContainer, .modalAccept{
+.mainPlayerContainer, .secondPlayerContainer, .modalAccept, .opponentChoiceMain, .opponentChoiceSecond{
 
 	display: none;
 
