@@ -116,27 +116,35 @@ $(document).ready(function(){
 			
 		}
 
-		// if(snapshot.val().requestStatus =='accepted' && snapshot.val().issecondPlayer == true){
+		if(snapshot.hasChild('ID') == true && snapshot.val().userChoice != 'none'){
 
-		// 	database.ref(snapshot.val().ID).update({
+			database.ref(snapshot.val().requestedBy).once("value").then(function(snapshotChoice){
 
-		// 		requestStatus : 'neutral',
+				if(snapshotChoice.val().userChoice != 'none'){
 
-		// 		inGame : false,
+					database.ref(snapshot.val().ID).update({
 
-		// 		mainPlayer : snapshot.val().requestedBy,
+						userChoice : 'none'
 
-		// 		secondPlayer: snapshot.val().ID,
+					});
 
-		// 	});
+					database.ref(snapshot.val().requestedBy).update({
 
-		// 	$('.secondPlayerContainer').addClass('container' + snapshot.val().ID);
+						userChoice : 'none'
 
-		// 	$('.container' + snapshot.val().ID).css('display', 'block');
-			
-		// }
+					});
 
+					$('.choice' + snapshot.val().requestedBy).html(_.capitalize(snapshotChoice.val().userChoice));
 
+					$('.choice' + snapshot.val().ID).html(_.capitalize(snapshot.val().userChoice));
+
+					checkWinner(snapshotChoice.val().userChoice, snapshot.val().userChoice, snapshotChoice.val().name, snapshot.val().name, snapshot.val().requestedBy, snapshot.val().ID);
+
+				}
+		
+			});
+
+		}
 
 	}, function(errorObject) {
 
@@ -318,9 +326,17 @@ $(document).ready(function(){
 
 		$('.opponentChoiceSecond').css('display', 'block');
 
+		$('.yourChoiceMain').css('display', 'block');
+
+		$('.choiceMain').addClass('responseMain' + userIdNumber);
+
+		$('.results').addClass('result'+ userIdNumber);
+
 		database.ref().once("value").then(function(snapshot){
 
 			database.ref(userIdNumber).once("value").then(function(snapshotReque){
+
+				$('.choiceSecond').addClass('choice' + snapshotReque.val().requestedBy);
 
 				database.ref(userIdNumber).update({
 
@@ -365,6 +381,106 @@ $(document).ready(function(){
 
 		$('.opponentChoiceMain').css('display', 'block');
 
+		$('.yourChoiceSecond').css('display', 'block');
+
+		$('.choiceSecond').addClass('responseSecond' + userIdNumber);
+
+		$('.results').addClass('result'+ userIdNumber);
+
+		database.ref(userIdNumber).once("value").then(function(snapshot){
+
+			$('.choiceMain').addClass('choice' + snapshot.val().requestedBy);
+		
+		});
+
 	});
+
+	$('.mainPlayer').on('click', function(){
+
+		var decision = $(this).attr('data-choice');
+
+		$('.yourMain').html(_.capitalize(decision));
+
+		database.ref(userIdNumber).update({
+
+			userChoice : decision
+
+		});
+
+	});
+
+	$('.secondPlayer').on('click', function(){
+
+		var decision = $(this).attr('data-choice');
+
+		$('.yourSecond').html(_.capitalize(decision));
+
+		database.ref(userIdNumber).update({
+
+			userChoice : decision
+
+		});
+
+	});
+
+	function checkWinner(value1, value2, name1, name2, ID1, ID2){
+
+		if(value1 == value2){
+
+			$('.result' + ID1).html('You Guys Tied .-.');
+
+			$('.result' + ID2).html('You Guys Tied .-.');
+
+		}
+
+		if(value1 == 'rock' && value2 == 'paper'){
+
+			$('.result' + ID1).html('The Winner Is ' + _.capitalize(name2));
+
+			$('.result' + ID2).html('The Winner Is ' + _.capitalize(name2));
+
+		}
+
+		if(value1 == 'paper' && value2 == 'rock'){
+
+			$('.result' + ID1).html('The Winner Is ' + _.capitalize(name1));
+
+			$('.result' + ID2).html('The Winner Is ' + _.capitalize(name1));
+
+		}
+
+		if(value1 == 'paper' && value2 == 'scissor'){
+
+			$('.result' + ID1).html('The Winner Is ' + _.capitalize(name2));
+
+			$('.result' + ID2).html('The Winner Is ' + _.capitalize(name2));
+
+		}
+
+		if(value1 == 'scissor' && value2 == 'paper'){
+
+			$('.result' + ID1).html('The Winner Is ' + _.capitalize(name1));
+
+			$('.result' + ID2).html('The Winner Is ' + _.capitalize(name1));
+
+		}
+
+		if(value1 == 'scissor' && value2 == 'rock'){
+
+			$('.result' + ID1).html('The Winner Is ' + _.capitalize(name2));
+
+			$('.result' + ID2).html('The Winner Is ' + _.capitalize(name2));
+
+		}
+
+		if(value1 == 'rock' && value2 == 'scissor'){
+
+			$('.result' + ID1).html('The Winner Is ' + _.capitalize(name1));
+
+			$('.result' + ID2).html('The Winner Is ' + _.capitalize(name1));
+
+		}
+
+	}
 
 });
